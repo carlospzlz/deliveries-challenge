@@ -6,9 +6,10 @@ from matplotlib import pyplot
 
 
 DRONE_MARKER = 'X'
-DRONE_COLOR = 'b'
+DRONE_COLOR = 'royalblue'
 CYCLIST_MARKER = 'o'
-CYCLIST_COLOR = 'm'
+CYCLIST_COLOR = 'orange'
+TRAIL_MARKER = '.'
 DELIVERY_MARKER = 's'
 DELIVERY_COLOR = 'r'
 
@@ -32,20 +33,22 @@ class Simulation(object):
 
     def __init_func(self):
         pyplot.axis((-20, 20, -20, 20))
-        pyplot.grid()
+        pyplot.grid(zorder=0)
         self.__plotDeliveries()
         self.__initializeVehicles()
 
     def __plotDeliveries(self):
         x_coords = [delivery.destination[0] for delivery in deliveries]
         y_coords = [delivery.destination[1] for delivery in deliveries]
-        pyplot.plot(x_coords, y_coords, DELIVERY_MARKER + DELIVERY_COLOR)
+        pyplot.scatter(
+            x_coords, y_coords, marker=DELIVERY_MARKER, color=DELIVERY_COLOR,
+            zorder=20)
 
     def __initializeVehicles(self):
         self.__drones_scatter = pyplot.scatter(
-            [0], [0], marker=DRONE_MARKER, color=DRONE_COLOR)
+            [0], [0], marker=DRONE_MARKER, color=DRONE_COLOR, zorder=40)
         self.__cyclists_scatter = pyplot.scatter(
-            [0], [0], marker=CYCLIST_MARKER, color=CYCLIST_COLOR)
+            [0], [0], marker=CYCLIST_MARKER, color=CYCLIST_COLOR, zorder=30)
         pyplot.legend(
             (self.__drones_scatter, self.__cyclists_scatter),
             ('Drones', 'Cyclists'))
@@ -66,7 +69,7 @@ class Simulation(object):
         for vehicles, color in trail:
             x = vehicles['position'][:, 0]
             y = vehicles['position'][:, 1]
-            pyplot.plot(x, y, color + '.', zorder=0)
+            pyplot.plot(x, y, marker=TRAIL_MARKER, color=color, zorder=10)
 
 
 if __name__ == '__main__':
@@ -75,6 +78,7 @@ if __name__ == '__main__':
         Delivery(('product0', 'product1', 'product2'), (5, 4)),
         Delivery(('product3'), (15, 9)),
         Delivery(('product4'), (6, 7)),
+        Delivery(('product5'), (7, 7)),
     ]
 
     sim = Simulation(deliveries, 1, 1, None)
