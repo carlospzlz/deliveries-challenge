@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 
+DRONE_MARKER = '^'
+DRONE_COLOR = 'b'
+CYCLIST_MARKER = 'o'
+CYCLIST_COLOR = 'r'
+
+
 class Simulation(object):
     """
     """
@@ -20,33 +26,31 @@ class Simulation(object):
     def __init_func(self):
         plt.axis((-20, 20, -20, 20))
         plt.grid()
-        self.__drones_scatter = plt.scatter([0], [0], marker='^')
-        self.__cyclists_scatter = plt.scatter([0], [0], marker='o')
+        self.__drones_scatter = plt.scatter(
+            [0], [0], marker=DRONE_MARKER, color=DRONE_COLOR)
+        self.__cyclists_scatter = plt.scatter(
+            [0], [0], marker=CYCLIST_MARKER, color=CYCLIST_COLOR)
         plt.legend(
             (self.__drones_scatter, self.__cyclists_scatter),
             ('Drones', 'Cyclists'))
 
     def __update(self, frame):
-        #self.__updateVehicles()
-        #self.__plotVehicles()
-        self.__drones['position'][0] += (1, 1)
-        self.__cyclists['position'][0] += (-1, 1)
-        self.__drones_scatter.set_offsets(self.__drones['position'])
-        self.__cyclists_scatter.set_offsets(self.__cyclists['position'])
+        self.__updateVehicles()
+        self.__plotVehicles()
 
     def __updateVehicles(self):
-        #for point in self.__points:
-        #    point[1] += 0.5
-        pass
+        self.__drones['position'][0] += (1, 1)
+        self.__cyclists['position'][0] += (-0.5, 0.5)
 
     def __plotVehicles(self):
-        #x_coords = []
-        #y_coords = []
-        #for point in self.__points:
-        #    x_coords.append(point[0])
-        #    y_coords.append(point[1])
-        #plt.plot(x_coords, y_coords, 'r.')
-        pass
+        self.__drones_scatter.set_offsets(self.__drones['position'])
+        self.__cyclists_scatter.set_offsets(self.__cyclists['position'])
+        trail = (
+            (self.__drones, DRONE_COLOR), (self.__cyclists, CYCLIST_COLOR))
+        for vehicles, color in trail:
+            x = vehicles['position'][:, 0]
+            y = vehicles['position'][:, 1]
+            plt.plot(x, y, color + '.', zorder=0)
 
 
 if __name__ == '__main__':
