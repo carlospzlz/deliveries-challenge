@@ -5,25 +5,55 @@ from matplotlib import animation
 from matplotlib import pyplot
 
 
+MAX_AXIS = 20
 DRONE_MARKER = 'X'
 DRONE_COLOR = 'royalblue'
 CYCLIST_MARKER = 'o'
 CYCLIST_COLOR = 'orange'
 TRAIL_MARKER = '.'
 DELIVERY_MARKER = 's'
-DELIVERY_COLOR = 'r'
+PENDING_DELIVERY_COLOR = 'r'
+DONE_DELIVERY_COLOR = 'lime'
+RELATIVE_TOLERANCE = 0
+ABSOLUTE_TOLERANCE = 0.5
 
 
 class Simulation(object):
     """
     """
-    def __init__(self, deliveries, n_drones, n_cyclists, schedule):
-        self.__deliveries = deliveries
-        self.__drones = numpy.zeros(n_drones, dtype=[('position', float, 2)])
-        self.__cyclists = numpy.zeros(
-            n_cyclists, dtype=[('position', float, 2)])
+    def __init__(self, deliveries, drones, cyclists, scheduler):
+        self.__deliveries, self.__delivered = self.__create_deliveries(
+            deliveries)
+        self.__drones = self.__create_vehicles_array(drones)
+        self.__cyclists = self.__create_vehicles_array(cyclists)
+        self.__routes = {}
+        self.__scheduler = scheduler
+        self.__deliveries_scatter = {}
         self.__drones_scatter = None
         self.__cyclists_scatter = None
+
+    def __create_deliveries(self, deliveries):
+        """
+        """
+        indexed_deliveries, indexed_delivered = {}, {}
+        for delivery in deliveries:
+            indexed_deliveries[delivery.destination] = set(delivery.packages)
+            indexed_delivered[delivery.destination] = set()
+        return indexed_deliveries, indexed_delivered
+
+    def __create_vehicles_array(self, vehicles):
+        """
+        """
+        array = numpy.zeros(
+            len(vehicles), dtype=[
+                ('position', float, 2),
+                ('destination', float, 2),
+                ('delta', float, 2),
+                ('id', str, 6),
+            ]
+        )
+        array['id'] = vehicles
+        return array
 
     def start(self):
         ani = animation.FuncAnimation(
@@ -32,21 +62,22 @@ class Simulation(object):
         pyplot.show()
 
     def __init_func(self):
-        pyplot.axis((-20, 20, -20, 20))
+        pyplot.axis((-MAX_AXIS, MAX_AXIS, -MAX_AXIS, MAX_AXIS))
         pyplot.grid(zorder=0)
-        self.__plotDeliveries()
+        self.__initializeDeliveries()
         self.__initializeVehicles()
 
-    def __plotDeliveries(self):
-        x_coords = [delivery.destination[0] for delivery in deliveries]
-        y_coords = [delivery.destination[1] for delivery in deliveries]
-        pyplot.scatter(
-            x_coords, y_coords, marker=DELIVERY_MARKER, color=DELIVERY_COLOR,
-            zorder=20)
+    def __initializeDeliveries(self):
+        for destination in self.__deliveries.keys():
+            x, y = destination
+            self.__deliveries_scatter[destination] = pyplot.scatter(
+                (x, ), (y, ), marker=DELIVERY_MARKER,
+                color='k', facecolors=PENDING_DELIVERY_COLOR, zorder=20)
 
     def __initializeVehicles(self):
         self.__drones_scatter = pyplot.scatter(
-            [0], [0], marker=DRONE_MARKER, color=DRONE_COLOR, zorder=40)
+            [0] * len(self.__drones), [0] * len(self.__drones),
+            marker=DRONE_MARKER, color=DRONE_COLOR, zorder=40)
         self.__cyclists_scatter = pyplot.scatter(
             [0], [0], marker=CYCLIST_MARKER, color=CYCLIST_COLOR, zorder=30)
         pyplot.legend(
@@ -58,8 +89,55 @@ class Simulation(object):
         self.__plotVehicles()
 
     def __updateVehicles(self):
-        self.__drones['position'][0] += (1, 1)
-        self.__cyclists['position'][0] += (-0.5, 0.5)
+        self.__updateDrones();
+
+    def __updateDrones(self):
+        for drone in numpy.nditer(self.__drones, op_flags=['readwrite']):
+            id_ = str(drone['id'])
+            if self.__vehicle_is_at_depot(drone):
+                route = self.__scheduler.getRoute()
+                if route:
+                    self.__routes[id_] = route
+                    destination, _ = route[0]
+                    drone['destination'] = destination
+                    length = numpy.sqrt((drone['destination'] ** 2).sum())
+                    drone['delta'] = drone['destination'] / length
+            elif self.__vehicle_is_at_destination(drone):
+                _, package = self.__routes[id_].pop()
+                destination = tuple(drone['destination'])
+                self.__deliver_packages(id_, 'drone', destination, (package, ))
+                drone['destination'] = numpy.zeros(2)
+                drone['delta'] = -drone['delta']
+            else:
+                drone['position'] += drone['delta']
+
+    def __vehicle_is_at_depot(self, vehicle):
+        """
+        """
+        return (self.__are_close(vehicle['destination'], numpy.zeros(2)) and
+                self.__are_close(vehicle['position'], numpy.zeros(2)))
+
+
+    def __vehicle_is_at_destination(self, vehicle):
+        """
+        """
+        return self.__are_close(vehicle['position'], vehicle['destination'])
+
+    def __are_close(self, array1, array2):
+        """
+        """
+        return numpy.allclose(
+            array1, array2, rtol=RELATIVE_TOLERANCE, atol=ABSOLUTE_TOLERANCE)
+
+    def __deliver_packages(self, id_, type_, destination, packages):
+        """
+        """
+        print('{} {} delivered to {} packages: {}'.format(
+            type_.capitalize(), id_, destination, packages))
+        self.__delivered[destination].update(packages)
+        if self.__delivered[destination] == self.__deliveries[destination]:
+            self.__deliveries_scatter[destination].set_facecolor(
+                DONE_DELIVERY_COLOR)
 
     def __plotVehicles(self):
         self.__drones_scatter.set_offsets(self.__drones['position'])
@@ -69,18 +147,45 @@ class Simulation(object):
         for vehicles, color in trail:
             x = vehicles['position'][:, 0]
             y = vehicles['position'][:, 1]
-            pyplot.plot(x, y, marker=TRAIL_MARKER, color=color, zorder=10)
+            pyplot.plot(
+                x, y, marker=TRAIL_MARKER, linestyle='', color=color,
+                zorder=10)
+
+
+class Scheduler(object):
+    def __init__(self):
+        self.__drones_routes = (
+            collections.deque(
+                (((5, 4), 'product0'), )),
+            collections.deque(
+                (((5, 4), 'product1'), )),
+            collections.deque(
+                (((5, 4), 'product2'), )),
+            collections.deque(
+                (((15, 9), 'product3'), )),
+            collections.deque(
+                (((6, 7), 'product4'), )),
+        )
+        self.__drones_routes_idx = 0
+
+    def getRoute(self):
+        if self.__drones_routes_idx < len(self.__drones_routes):
+            route = self.__drones_routes[self.__drones_routes_idx]
+            self.__drones_routes_idx += 1
+            return route
+        return None
 
 
 if __name__ == '__main__':
     Delivery = collections.namedtuple('Delivery', 'packages destination')
     deliveries = [
         Delivery(('product0', 'product1', 'product2'), (5, 4)),
-        Delivery(('product3'), (15, 9)),
-        Delivery(('product4'), (6, 7)),
-        Delivery(('product5'), (7, 7)),
+        Delivery(('product3', ), (15, 9)),
+        Delivery(('product4', ), (6, 7)),
     ]
 
-    sim = Simulation(deliveries, 1, 1, None)
+    #drones = ('hey', 'hoy', 'hay')
+    drones = ('hey', )
+    cyclists = ('holi', )
+    sim = Simulation(deliveries, drones, cyclists, Scheduler())
     sim.start()
-
