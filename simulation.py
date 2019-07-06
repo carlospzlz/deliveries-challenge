@@ -64,38 +64,47 @@ class Simulation(object):
     def __init_func(self):
         pyplot.axis((-MAX_AXIS, MAX_AXIS, -MAX_AXIS, MAX_AXIS))
         pyplot.grid(zorder=0)
-        self.__initializeDeliveries()
-        self.__initializeVehicles()
+        self.__initialize_deliveries()
+        self.__initialize_vehicles()
 
-    def __initializeDeliveries(self):
+    def __initialize_deliveries(self):
         for destination in self.__deliveries.keys():
             x, y = destination
             self.__deliveries_scatter[destination] = pyplot.scatter(
                 (x, ), (y, ), marker=DELIVERY_MARKER,
                 color='k', facecolors=PENDING_DELIVERY_COLOR, zorder=20)
 
-    def __initializeVehicles(self):
-        self.__drones_scatter = pyplot.scatter(
-            [0] * len(self.__drones), [0] * len(self.__drones),
-            marker=DRONE_MARKER, color=DRONE_COLOR, zorder=40)
-        self.__cyclists_scatter = pyplot.scatter(
-            [0], [0], marker=CYCLIST_MARKER, color=CYCLIST_COLOR, zorder=30)
+    def __initialize_vehicles(self):
+        self.__drones_scatter = self.__create_vehicles_scatter(
+            self.__drones, DRONE_MARKER, DRONE_COLOR, 40)
+        self.__cyclists_scatter = self.__create_vehicles_scatter(
+            self.__cyclists, CYCLIST_MARKER, CYCLIST_COLOR, 30)
         pyplot.legend(
             (self.__drones_scatter, self.__cyclists_scatter),
             ('Drones', 'Cyclists'))
 
+    def __create_vehicles_scatter(self, vehicles, marker, color, zorder):
+        """
+        """
+        n = len(vehicles)
+        scatter = pyplot.scatter(
+            numpy.zeros(n), numpy.zeros(n), marker=marker, color=color,
+            zorder=zorder)
+        return scatter
+
     def __update(self, frame):
-        self.__updateVehicles()
-        self.__plotVehicles()
+        self.__update_vehicles()
+        self.__plot_vehicles()
 
-    def __updateVehicles(self):
-        self.__updateDrones();
+    def __update_vehicles(self):
+        self.__update_drones()
+        self.__update_cyclists()
 
-    def __updateDrones(self):
+    def __update_drones(self):
         for drone in numpy.nditer(self.__drones, op_flags=['readwrite']):
             id_ = str(drone['id'])
             if self.__vehicle_is_at_depot(drone):
-                route = self.__scheduler.getRoute()
+                route = self.__scheduler.get_route()
                 if route:
                     self.__routes[id_] = route
                     destination, _ = route[0]
@@ -110,6 +119,11 @@ class Simulation(object):
                 drone['delta'] = -drone['delta']
             else:
                 drone['position'] += drone['delta']
+
+    def __update_cyclists(self):
+        """
+        """
+        pass
 
     def __vehicle_is_at_depot(self, vehicle):
         """
@@ -139,7 +153,7 @@ class Simulation(object):
             self.__deliveries_scatter[destination].set_facecolor(
                 DONE_DELIVERY_COLOR)
 
-    def __plotVehicles(self):
+    def __plot_vehicles(self):
         self.__drones_scatter.set_offsets(self.__drones['position'])
         self.__cyclists_scatter.set_offsets(self.__cyclists['position'])
         trail = (
@@ -168,7 +182,7 @@ class Scheduler(object):
         )
         self.__drones_routes_idx = 0
 
-    def getRoute(self):
+    def get_route(self):
         if self.__drones_routes_idx < len(self.__drones_routes):
             route = self.__drones_routes[self.__drones_routes_idx]
             self.__drones_routes_idx += 1
