@@ -3,11 +3,11 @@ This module contains a convenience class Simulation to test and visualize
 results with different combinations of number of drones, cyclists and specific
 schedulers.
 """
-import collections
 
 import numpy
 from matplotlib import animation
 from matplotlib import pyplot
+
 
 # Drawing context.
 FIGURE_SIZE = (480, 480)
@@ -306,42 +306,3 @@ class Simulation(object):
             pyplot.plot(
                 x, y, marker=TRAIL_MARKER, linestyle='', color=color,
                 zorder=10)
-
-
-class Scheduler(object):
-    def __init__(self):
-        self.__drones_routes = (
-            collections.deque(
-                (((5, 4), 'product0'), )),
-            collections.deque(
-                (((5, 4), 'product1'), )),
-            collections.deque(
-                (((5, 4), 'product2'), )),
-            collections.deque(
-                (((15, 9), 'product3'), )),
-            collections.deque(
-                (((6, 7), 'product4'), )),
-        )
-        self.__drones_routes_idx = 0
-
-    def get_route(self):
-        if self.__drones_routes_idx < len(self.__drones_routes):
-            route = self.__drones_routes[self.__drones_routes_idx]
-            self.__drones_routes_idx += 1
-            return route
-        return None
-
-
-if __name__ == '__main__':
-    Delivery = collections.namedtuple('Delivery', 'packages destination')
-    deliveries = [
-        Delivery(('product0', 'product1', 'produ/ct2'), (5, 4)),
-        Delivery(('product3', ), (15, 9)),
-        Delivery(('product4', ), (6, 7)),
-    ]
-
-    #drones = ('hey', 'hoy', 'hay')
-    drones = ('hey', )
-    cyclists = ('holi', )
-    sim = Simulation(deliveries, drones, cyclists, Scheduler())
-    sim.start()

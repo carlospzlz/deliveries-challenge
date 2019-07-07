@@ -1,5 +1,0 @@
-3 product0 product1 product2 5 4
-1 product3 15 9
-1 product4 6 7
-3 product5 product6 product2 -15 -15
-4 product7 product8 product9 product10 -19 15
