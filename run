@@ -75,7 +75,6 @@ def main():
     drones = [generate_random_id() for _ in range(args.drones)]
     cyclists = [generate_random_id() for _ in range(args.cyclists)]
     deliveries = read_deliveries()
-    print(deliveries)
 
 
     #deliveries = [

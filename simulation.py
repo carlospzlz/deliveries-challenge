@@ -16,6 +16,8 @@ PENDING_DELIVERY_COLOR = 'r'
 DONE_DELIVERY_COLOR = 'lime'
 RELATIVE_TOLERANCE = 0
 ABSOLUTE_TOLERANCE = 0.5
+# Delay between frames in milliseconds.
+FRAME_DELAY = 10
 
 
 class Simulation(object):
@@ -31,7 +33,8 @@ class Simulation(object):
         self.__deliveries_scatter = {}
         self.__drones_scatter = None
         self.__cyclists_scatter = None
-        self.__ticks = 0
+        self.__tick = 0
+        self.__time = '0h 0s'
         self.__total_kms = 0
         self.__hud = None
 
@@ -61,7 +64,7 @@ class Simulation(object):
     def start(self):
         ani = animation.FuncAnimation(
             pyplot.gcf(), self.__update, init_func=self.__init_func,
-            interval=10)
+            interval=FRAME_DELAY)
         pyplot.show()
 
     def __init_func(self):
@@ -98,7 +101,7 @@ class Simulation(object):
 
     def __initialize_hud(self):
         self.__hud = pyplot.text(
-            MAX_AXIS - 6, 2 - MAX_AXIS, '0 ticks\n0 kms',
+            MAX_AXIS - 9, 2 - MAX_AXIS, '0 ticks\n0 kms',
             bbox=dict(facecolor='white'))
 
     def __update(self, frame):
@@ -108,8 +111,12 @@ class Simulation(object):
 
     def __update_hud(self, frame):
         if self.__deliveries != self.__delivered:
-            self.__ticks = frame
-        text = '{} ticks\n{} kms'.format(self.__ticks, self.__total_kms)
+            self.__tick = frame
+            # Each tick is 2 minutes.
+            minutes = self.__tick * 2
+            self.__time = '{}h {}m'.format(int(minutes / 60), minutes % 60)
+        text = 'Tick:  {}\nTime: {}\nKms:  {}'.format(
+            self.__tick, self.__time, self.__total_kms)
         self.__hud.set_text(text)
 
     def __update_vehicles(self):
@@ -127,6 +134,7 @@ class Simulation(object):
                     destination, _ = route[0]
                     drone['destination'] = destination
                     length = numpy.sqrt((drone['destination'] ** 2).sum())
+                    # Drones move at a speed of 1km/tick (1km/2minutes)
                     drone['delta'] = drone['destination'] / length
             elif self.__vehicle_is_at_destination(drone):
                 _, package = self.__routes[id_].pop()
