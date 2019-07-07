@@ -51,7 +51,7 @@ class Scheduler2(Scheduler):
         total_weight = 0
         while self.__cyclists_queue:
             destination, product = self.__cyclists_queue[0]
-            total_weight = self.__weights[product]
+            total_weight += self.__weights[product]
             if total_weight <= 50:
                 route_stop = (destination, (product, ))
                 route.append(route_stop)
