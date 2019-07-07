@@ -8,9 +8,14 @@ from scheduler import Scheduler
 
 class Scheduler2(Scheduler):
     """
-    This maximizes the load of the cyclists.
+    This scheduler distributes all the packages in two queues, one for the
+    drones and other for the cyclists. In addition, it tries to batch packages
+    for a single cyclist.
 
     This scheduler presents the following problems:
+    - Due to the fact that we treat packages independently the routes for the
+    cyclists are very inefficient.
+    - The number of drones could be a bottleneck.
     """
     def __init__(self, deliveries, weights):
         """
@@ -52,7 +57,7 @@ class Scheduler2(Scheduler):
         while self.__cyclists_queue:
             destination, product = self.__cyclists_queue[0]
             total_weight += self.__weights[product]
-            if total_weight <= 50:
+            if len(route) < 4 and total_weight <= 50:
                 route_stop = (destination, (product, ))
                 route.append(route_stop)
                 self.__cyclists_queue.popleft()

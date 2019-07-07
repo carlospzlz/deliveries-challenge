@@ -4,6 +4,8 @@ results with different combinations of number of drones, cyclists and specific
 schedulers.
 """
 
+from collections import Counter
+
 import numpy
 from matplotlib import animation
 from matplotlib import pyplot
@@ -62,11 +64,12 @@ class Simulation(object):
         """
         Creates needed structures to track state of deliveries.
         """
-        indexed_deliveries, indexed_delivered = {}, {}
+        counted_deliveries, counted_delivered = {}, {}
         for delivery in deliveries:
-            indexed_deliveries[delivery.destination] = set(delivery.packages)
-            indexed_delivered[delivery.destination] = set()
-        return indexed_deliveries, indexed_delivered
+            counted_deliveries[delivery.destination] = Counter(
+                delivery.packages)
+            counted_delivered[delivery.destination] = Counter()
+        return counted_deliveries, counted_delivered
 
     def __create_vehicles_array(self, vehicles):
         """
