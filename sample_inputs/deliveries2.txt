@@ -1,0 +1,4 @@
+1 product0 15 0
+1 product1 0 -15
+1 product2 -15 0
+1 product3 0 15

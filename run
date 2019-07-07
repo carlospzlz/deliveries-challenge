@@ -7,6 +7,8 @@ import string
 import sys
 
 from simulation import Simulation
+from scheduler import Delivery
+from scheduler1 import Scheduler1
 
 
 def parse_args():
@@ -82,9 +84,21 @@ def main():
     #    Delivery(('product3', ), (15, 9)),
     #    Delivery(('product4', ), (6, 7)),
     #]
-
-
-    simulation = Simulation(deliveries, drones, cyclists, Scheduler())
+    weights = {
+        'product0': 0,
+        'product1': 0,
+        'product2': 0,
+        'product3': 0,
+        'product4': 0,
+        'product5': 0,
+        'product6': 0,
+        'product7': 0,
+        'product8': 0,
+        'product9': 0,
+        'product10': 0,
+    }
+    scheduler = Scheduler1(deliveries, weights)
+    simulation = Simulation(deliveries, drones, cyclists, scheduler)
     simulation.start()
 
 
