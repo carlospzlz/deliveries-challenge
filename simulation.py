@@ -31,6 +31,7 @@ class Simulation(object):
         self.__deliveries_scatter = {}
         self.__drones_scatter = None
         self.__cyclists_scatter = None
+        self.__ticks = 0
         self.__total_kms = 0
         self.__hud = None
 
@@ -101,13 +102,14 @@ class Simulation(object):
             bbox=dict(facecolor='white'))
 
     def __update(self, frame):
-        if self.__deliveries != self.__delivered:
-            self.__update_hud(frame)
+        self.__update_hud(frame)
         self.__update_vehicles()
         self.__plot_vehicles()
 
     def __update_hud(self, frame):
-        text = '{} ticks\n{} kms'.format(frame, self.__total_kms)
+        if self.__deliveries != self.__delivered:
+            self.__ticks = frame
+        text = '{} ticks\n{} kms'.format(self.__ticks, self.__total_kms)
         self.__hud.set_text(text)
 
     def __update_vehicles(self):
