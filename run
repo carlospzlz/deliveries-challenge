@@ -4,6 +4,7 @@ import argparse
 import collections
 import random
 import string
+import sys
 
 from simulation import Simulation
 
@@ -55,19 +56,33 @@ class Scheduler(object):
             return route
         return None
 
+Delivery = collections.namedtuple('Delivery', 'packages destination')
+
+def read_deliveries():
+    """
+    """
+    deliveries = []
+    for line in sys.stdin:
+        line = line.strip()
+        tokens = line.split()
+        packages = tokens[1:1 + int(tokens[0])]
+        destination = (int(tokens[-2]), int(tokens[-1]))
+        deliveries.append(Delivery(packages, destination))
+    return deliveries
 
 def main():
     args = parse_args()
     drones = [generate_random_id() for _ in range(args.drones)]
     cyclists = [generate_random_id() for _ in range(args.cyclists)]
+    deliveries = read_deliveries()
+    print(deliveries)
 
 
-    Delivery = collections.namedtuple('Delivery', 'packages destination')
-    deliveries = [
-        Delivery(('product0', 'product1', 'product2'), (5, 4)),
-        Delivery(('product3', ), (15, 9)),
-        Delivery(('product4', ), (6, 7)),
-    ]
+    #deliveries = [
+    #    Delivery(('product0', 'product1', 'product2'), (5, 4)),
+    #    Delivery(('product3', ), (15, 9)),
+    #    Delivery(('product4', ), (6, 7)),
+    #]
 
 
     simulation = Simulation(deliveries, drones, cyclists, Scheduler())
