@@ -31,6 +31,8 @@ class Simulation(object):
         self.__deliveries_scatter = {}
         self.__drones_scatter = None
         self.__cyclists_scatter = None
+        self.__total_kms = 0
+        self.__hud = None
 
     def __create_deliveries(self, deliveries):
         """
@@ -66,6 +68,7 @@ class Simulation(object):
         pyplot.grid(zorder=0)
         self.__initialize_deliveries()
         self.__initialize_vehicles()
+        self.__initialize_hud()
 
     def __initialize_deliveries(self):
         for destination in self.__deliveries.keys():
@@ -92,16 +95,28 @@ class Simulation(object):
             zorder=zorder)
         return scatter
 
+    def __initialize_hud(self):
+        self.__hud = pyplot.text(
+            MAX_AXIS - 6, 2 - MAX_AXIS, '0 ticks\n0 kms',
+            bbox=dict(facecolor='white'))
+
     def __update(self, frame):
+        if self.__deliveries != self.__delivered:
+            self.__update_hud(frame)
         self.__update_vehicles()
         self.__plot_vehicles()
+
+    def __update_hud(self, frame):
+        text = '{} ticks\n{} kms'.format(frame, self.__total_kms)
+        self.__hud.set_text(text)
 
     def __update_vehicles(self):
         self.__update_drones()
         self.__update_cyclists()
 
     def __update_drones(self):
-        for drone in numpy.nditer(self.__drones, op_flags=['readwrite']):
+        for drone in numpy.nditer(
+                self.__drones, flags=['zerosize_ok'], op_flags=['readwrite']):
             id_ = str(drone['id'])
             if self.__vehicle_is_at_depot(drone):
                 route = self.__scheduler.get_route()
@@ -119,6 +134,7 @@ class Simulation(object):
                 drone['delta'] = -drone['delta']
             else:
                 drone['position'] += drone['delta']
+                self.__total_kms += 1
 
     def __update_cyclists(self):
         """
