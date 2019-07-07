@@ -17,8 +17,10 @@ FRAME_DELAY = 10  # Delay between frames in milliseconds.
 # Object drawing.
 DRONE_MARKER = 'X'
 DRONE_COLOR = 'royalblue'
+DRONE_TRAIL_COLOR = 'cornflowerblue'
 CYCLIST_MARKER = 'o'
 CYCLIST_COLOR = 'orange'
+CYCLIST_TRAIL_COLOR = 'gold'
 TRAIL_MARKER = '.'
 DELIVERY_MARKER = 's'
 PENDING_DELIVERY_COLOR = 'r'
@@ -234,7 +236,7 @@ class Simulation(object):
                     cyclist['destination'] = destination
             elif self.__vehicle_is_at_destination(cyclist):
                 route = self.__routes[id_]
-                destination, packages = route.pop()
+                destination, packages = route.popleft()
                 self.__deliver_packages(id_, 'cyclist', destination, packages)
                 if route:
                     destination, _ = route[0]
@@ -299,7 +301,8 @@ class Simulation(object):
         self.__drones_scatter.set_offsets(self.__drones['position'])
         self.__cyclists_scatter.set_offsets(self.__cyclists['position'])
         trail = (
-            (self.__drones, DRONE_COLOR), (self.__cyclists, CYCLIST_COLOR))
+            (self.__drones, DRONE_TRAIL_COLOR),
+            (self.__cyclists, CYCLIST_TRAIL_COLOR))
         for vehicles, color in trail:
             x = vehicles['position'][:, 0]
             y = vehicles['position'][:, 1]

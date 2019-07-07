@@ -60,11 +60,14 @@ class Scheduler(object):
 
 Delivery = collections.namedtuple('Delivery', 'packages destination')
 
+
 def read_deliveries():
     """
     """
+    n = int(sys.stdin.readline())
     deliveries = []
-    for line in sys.stdin:
+    for _ in range(n):
+        line = sys.stdin.readline()
         line = line.strip()
         tokens = line.split()
         packages = tokens[1:1 + int(tokens[0])]
@@ -72,32 +75,41 @@ def read_deliveries():
         deliveries.append(Delivery(packages, destination))
     return deliveries
 
+
+def read_weights():
+    """
+    """
+    n = int(sys.stdin.readline())
+    weights = {}
+    for _ in range(n):
+        line = sys.stdin.readline()
+        line = line.strip()
+        product, weight = line.split()
+        weights[product] = float(weight)
+    return weights
+
+
+def assert_all_packages_have_weight(deliveries, weights):
+    """
+    """
+    for delivery in deliveries:
+        for product in delivery.packages:
+            if product not in weights:
+                msg = 'ERROR: All products must have a weight: {}'
+                print(msg.format(package))
+                sys.exit(1)
+
+
 def main():
     args = parse_args()
     drones = [generate_random_id() for _ in range(args.drones)]
     cyclists = [generate_random_id() for _ in range(args.cyclists)]
     deliveries = read_deliveries()
-
-
-    #deliveries = [
-    #    Delivery(('product0', 'product1', 'product2'), (5, 4)),
-    #    Delivery(('product3', ), (15, 9)),
-    #    Delivery(('product4', ), (6, 7)),
-    #]
-    weights = {
-        'product0': 0,
-        'product1': 0,
-        'product2': 0,
-        'product3': 0,
-        'product4': 0,
-        'product5': 0,
-        'product6': 0,
-        'product7': 0,
-        'product8': 0,
-        'product9': 0,
-        'product10': 0,
-    }
-    scheduler = Scheduler1(deliveries, weights)
+    weights = read_weights()
+    assert_all_packages_have_weight(deliveries, weights)
+    scheduler_module = __import__(args.scheduler)
+    scheduler_class = getattr(scheduler_module, args.scheduler.capitalize())
+    scheduler = scheduler_class(deliveries, weights)
     simulation = Simulation(deliveries, drones, cyclists, scheduler)
     simulation.start()
 
