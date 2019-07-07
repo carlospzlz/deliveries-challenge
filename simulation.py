@@ -12,7 +12,7 @@ from matplotlib import pyplot
 # Drawing context.
 FIGURE_SIZE = (480, 480)
 MAX_AXIS = 20
-FRAME_DELAY = 10 # Delay between frames in milliseconds.
+FRAME_DELAY = 10  # Delay between frames in milliseconds.
 
 # Object drawing.
 DRONE_MARKER = 'X'
@@ -37,6 +37,7 @@ class Simulation(object):
     and to identify how that affects to the time and total kms needed to
     perform all deliveries.
     """
+
     def __init__(self, deliveries, drones, cyclists, scheduler):
         """
         Constructs the simulation.
@@ -265,7 +266,6 @@ class Simulation(object):
         """
         return (self.__are_close(vehicle['destination'], numpy.zeros(2)) and
                 self.__are_close(vehicle['position'], numpy.zeros(2)))
-
 
     def __vehicle_is_at_destination(self, vehicle):
         """
