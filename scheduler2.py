@@ -72,6 +72,8 @@ class Scheduler2(Scheduler):
                 self.__cyclists_queue.popleft()
             else:
                 return route
+        # After all elements in the queue have been consumed we may have a
+        # valid route.
         if route:
             return route
         return None
