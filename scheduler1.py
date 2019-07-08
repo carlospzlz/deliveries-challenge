@@ -52,7 +52,7 @@ class Scheduler1(Scheduler):
             delivery = self.__queue[0]
             packages = delivery.packages
             total_weight = sum(self.__weights[package] for package in packages)
-            if total_weight < 50:
+            if total_weight <= 50:
                 self.__queue.popleft()
                 route_stop = (delivery.destination, packages)
                 route = deque((route_stop, ))

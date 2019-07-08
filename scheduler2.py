@@ -1,4 +1,8 @@
 """
+This module contains a scheduler based on two queues, one with packages to be
+delivered by drones and other with packages to be delivered by cyclists.
+This scheduler also implements some basic batching for the packages for the
+cyclists.
 """
 
 from collections import deque
@@ -19,22 +23,23 @@ class Scheduler2(Scheduler):
     """
 
     def __init__(self, deliveries, weights):
-        """
-        """
         super(Scheduler2, self).__init__('Scheduler2')
         self.__weights = weights
         self.__drones_queue, self.__cyclists_queue = self.__create_queues(
-            deliveries)
+            deliveries, weights)
 
-    def __create_queues(self, deliveries):
+    @staticmethod
+    def __create_queues(deliveries, weights):
         """
+        Creates two queues of packages, one for the drones and other for the
+        cyclists.
         """
         drones_queue = deque()
         cyclists_queue = deque()
         for delivery in deliveries:
             for product in delivery.packages:
                 package = (delivery.destination, product)
-                if self.__weights[product] <= 5:
+                if weights[product] <= 5:
                     drones_queue.append(package)
                 else:
                     cyclists_queue.append(package)
@@ -42,6 +47,7 @@ class Scheduler2(Scheduler):
 
     def get_route_for_drone(self):
         """
+        Returns the a route for the next package in the drones queue.
         """
         if self.__drones_queue:
             destination, product = self.__drones_queue.popleft()
@@ -52,6 +58,8 @@ class Scheduler2(Scheduler):
 
     def get_route_for_cyclist(self):
         """
+        Returns a route batching the maximum number of packages from the queue
+        up to 4 or 50kg.
         """
         route = deque()
         total_weight = 0
