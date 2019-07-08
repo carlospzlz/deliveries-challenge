@@ -15,7 +15,7 @@ class Scheduler3(Scheduler):
     """
 
     def __init__(self, deliveries, weights):
-        super(Scheduler2, self).__init__('Scheduler3')
+        super(Scheduler3, self).__init__('Scheduler3')
         self.__weights = weights
         self.__drones_queue, self.__cyclists_queue = self.__create_queues(
             deliveries, weights)
@@ -50,10 +50,10 @@ class Scheduler3(Scheduler):
 
         Returns whether a re-balancing happened or not.
         """
-        n, m = len(self.__drones_packages), len(self.__cyclists_packages)
+        n, m = len(self.__drones_queue), len(self.__cyclists_queue)
         if  n > m:
-            for  in range(int((n + 1) / 2)):
-                self.__cyclists_queue.append(self.__drones_queue.popleft)
+            for _ in range(int((n + 1) / 2)):
+                self.__cyclists_queue.append(self.__drones_queue.popleft())
             return True
         return False
 
@@ -63,7 +63,8 @@ class Scheduler3(Scheduler):
         Sorts all the packages by the angle between the X axis and their
         position vector.
         """
-        return sorted(packages, key = lambda v :atan(x[1]. v[0]))
+        sorted_list = sorted(packages, key = lambda p: atan(p[0][1] / p[0][0]))
+        return deque(sorted_list)
 
     def get_route_for_drone(self):
         """
@@ -86,7 +87,7 @@ class Scheduler3(Scheduler):
         while self.__cyclists_queue:
             destination, product = self.__cyclists_queue[0]
             total_weight += self.__weights[product]
-            if len(route) < 4 and total_weight <= 50:
+            if len(route_stops) < 4 and total_weight <= 50:
                 route_stop = (destination, (product, ))
                 route_stops.append(route_stop)
                 self.__cyclists_queue.popleft()
@@ -94,29 +95,30 @@ class Scheduler3(Scheduler):
                 return self.__create_best_route(route_stops)
         # After all elements in the queue have been consumed we may have a
         # valid route.
-        if route_routes:
+        if route_stops:
             return self.__create_best_route(route_stops)
         return None
 
     @staticmethod
-    def create_best_route(route_stops):
+    def __create_best_route(route_stops):
         """
         TPS
         """
-        routes = combinations(route_stops)
-        min_kms, route = maxsize, None
+        routes = combinations(route_stops, len(route_stops))
+        min_kms, best_route = maxsize, None
         for route in routes:
-            kms = caculate_route_distance(route)
+            kms = Scheduler3.__calculate_route_distance(route)
             if kms < min_kms:
-                min_kms, route = kms, route
-        return route
+                min_kms, best_route = kms, route
+        print('BEST ROUTE: {}'.format(best_route))
+        return deque(route)
 
     @staticmethod
-    def caculate_route_distance(route):
+    def __calculate_route_distance(route):
         """
         """
         previous_destination = (0, 0)
-        km = 0
+        kms = 0
         for route_stop in route:
             destination, _ = route_stop
             kms += sqrt(
@@ -125,4 +127,4 @@ class Scheduler3(Scheduler):
             previous_destination = destination
         kms += sqrt(
             pow(previous_destination[0], 2) + pow(previous_destination[1], 2))
-        return km
+        return kms
