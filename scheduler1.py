@@ -21,9 +21,6 @@ class Scheduler1(Scheduler):
     """
 
     def __init__(self, deliveries, weights):
-        """
-        Constructs the scheduler.
-        """
         super(Scheduler1, self).__init__('Scheduler1')
         self.__queue = deque(deliveries)
         self.__weights = weights
