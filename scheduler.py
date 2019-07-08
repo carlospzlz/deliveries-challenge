@@ -13,6 +13,7 @@ class Scheduler(ABC):
     """
     Base abstract class for schedulers.
     """
+
     def __init__(self, name):
         self.__name = name
 

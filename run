@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+
 import argparse
 import collections
 import random
@@ -8,7 +9,6 @@ import sys
 
 from simulation import Simulation
 from scheduler import Delivery
-from scheduler1 import Scheduler1
 
 
 def parse_args():
@@ -17,7 +17,7 @@ def parse_args():
     """
     description = (
         'Runs a simulation for the deliveries challenge.')
-    parser = argparse.ArgumentParser(description= description)
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         'drones', type=int, help='Number of drones')
     parser.add_argument(
@@ -29,40 +29,22 @@ def parse_args():
 
 def generate_random_id():
     """
-    Generate a random ID of the from '[AA-ZZ][0000-9999]'
+    Generates a random ID of the from '[AA-ZZ][0000-9999]'
     """
     return ''.join(
         random.choices(string.ascii_uppercase, k=2) +
         random.choices(string.digits, k=4))
 
-class Scheduler(object):
-    def __init__(self):
-        self.__drones_routes = (
-            collections.deque(
-                (((5, 4), 'product0'), )),
-            collections.deque(
-                (((5, 4), 'product1'), )),
-            collections.deque(
-                (((5, 4), 'product2'), )),
-            collections.deque(
-                (((15, 9), 'product3'), )),
-            collections.deque(
-                (((6, 7), 'product4'), )),
-        )
-        self.__drones_routes_idx = 0
-
-    def get_route(self):
-        if self.__drones_routes_idx < len(self.__drones_routes):
-            route = self.__drones_routes[self.__drones_routes_idx]
-            self.__drones_routes_idx += 1
-            return route
-        return None
-
-Delivery = collections.namedtuple('Delivery', 'packages destination')
-
 
 def read_deliveries():
     """
+    Reads deliveries from stdin.
+
+    It is expected something like:
+    3
+    3 product0 product1 product2 5 4
+    1 product3 15 9
+    1 product4 6 7
     """
     n = int(sys.stdin.readline())
     deliveries = []
@@ -78,6 +60,15 @@ def read_deliveries():
 
 def read_weights():
     """
+    Reads weights from stdin.
+
+    It is expected something like:
+    5
+    product0 3.5
+    product1 4.5
+    product2 8.2
+    product3 5
+    product4 43
     """
     n = int(sys.stdin.readline())
     weights = {}
@@ -91,6 +82,7 @@ def read_weights():
 
 def assert_all_packages_have_weight(deliveries, weights):
     """
+    Asserts all weights were given for all products in packages.
     """
     for delivery in deliveries:
         for product in delivery.packages:

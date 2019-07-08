@@ -17,6 +17,7 @@ class Scheduler2(Scheduler):
     cyclists are very inefficient.
     - The number of drones could be a bottleneck.
     """
+
     def __init__(self, deliveries, weights):
         """
         """

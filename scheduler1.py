@@ -19,6 +19,7 @@ class Scheduler1(Scheduler):
     - Cyclists do single deliveries even if the have capacity to batch some of
     them.
     """
+
     def __init__(self, deliveries, weights):
         """
         Constructs the scheduler.
