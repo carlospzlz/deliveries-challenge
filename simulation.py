@@ -60,7 +60,8 @@ class Simulation(object):
         self.__total_kms = 0
         self.__hud = None
 
-    def __create_deliveries(self, deliveries):
+    @staticmethod
+    def __create_deliveries(deliveries):
         """
         Creates needed structures to track state of deliveries.
         """
@@ -71,7 +72,8 @@ class Simulation(object):
             counted_delivered[delivery.destination] = Counter()
         return counted_deliveries, counted_delivered
 
-    def __create_vehicles_array(self, vehicles):
+    @staticmethod
+    def __create_vehicles_array(vehicles):
         """
         Creates a numpy array with data about the given vehicles to simulate
         their behaviour.
@@ -136,7 +138,8 @@ class Simulation(object):
             (self.__drones_scatter, self.__cyclists_scatter),
             ('Drones', 'Cyclists'))
 
-    def __create_vehicles_scatter(self, vehicles, marker, color, zorder):
+    @staticmethod
+    def __create_vehicles_scatter(vehicles, marker, color, zorder):
         """
         Initializes a point scatter to draw a specific type of vehicles with
         the given characteristics.
@@ -252,7 +255,8 @@ class Simulation(object):
                 cyclist['position'] += cyclist['delta']
                 self.__total_kms += 0.5
 
-    def __update_cyclist_delta(self, cyclist):
+    @staticmethod
+    def __update_cyclist_delta(cyclist):
         """
         Updating the given cyclist delta according to its current position and
         destination.
@@ -265,20 +269,25 @@ class Simulation(object):
             y = 0.5 * numpy.sign(aim[1])
             cyclist['delta'] = numpy.array((0, y))
 
-    def __vehicle_is_at_depot(self, vehicle):
+    @staticmethod
+    def __vehicle_is_at_depot(vehicle):
         """
         Returns whether the given vehicle is at the depot.
         """
-        return (self.__are_close(vehicle['destination'], numpy.zeros(2)) and
-                self.__are_close(vehicle['position'], numpy.zeros(2)))
+        return (
+            Simulation.__are_close(vehicle['destination'], numpy.zeros(2)) and
+            Simulation.__are_close(vehicle['position'], numpy.zeros(2)))
 
-    def __vehicle_is_at_destination(self, vehicle):
+    @staticmethod
+    def __vehicle_is_at_destination(vehicle):
         """
         Returns whether the given vehicle is at its destination.
         """
-        return self.__are_close(vehicle['position'], vehicle['destination'])
+        return Simulation.__are_close(
+            vehicle['position'], vehicle['destination'])
 
-    def __are_close(self, array1, array2):
+    @staticmethod
+    def __are_close(array1, array2):
         """
         Returns if two points are close to each other.
         """
