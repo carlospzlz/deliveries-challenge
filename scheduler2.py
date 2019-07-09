@@ -25,25 +25,8 @@ class Scheduler2(Scheduler):
     def __init__(self, deliveries, weights):
         super(Scheduler2, self).__init__('Scheduler2')
         self.__weights = weights
-        self.__drones_queue, self.__cyclists_queue = self.__create_queues(
+        self.__drones_queue, self.__cyclists_queue = self._create_queues(
             deliveries, weights)
-
-    @staticmethod
-    def __create_queues(deliveries, weights):
-        """
-        Creates two queues of packages, one for the drones and other for the
-        cyclists.
-        """
-        drones_queue = deque()
-        cyclists_queue = deque()
-        for delivery in deliveries:
-            for product in delivery.packages:
-                package = (delivery.destination, product)
-                if weights[product] <= 5:
-                    drones_queue.append(package)
-                else:
-                    cyclists_queue.append(package)
-        return drones_queue, cyclists_queue
 
     def get_route_for_drone(self):
         """

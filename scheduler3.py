@@ -3,7 +3,7 @@
 
 from collections import deque
 from itertools import combinations
-from math import atan, sqrt
+from math import atan2, pi, sqrt
 from sys import maxsize
 
 
@@ -12,33 +12,21 @@ from scheduler import Scheduler
 
 class Scheduler3(Scheduler):
     """
+
+    This scheduler presents the following problems:
+    - This scheduler uses a greedy approach to batch the packages in the queue,
+    the problem with this is that heavy packages might be added to a batch,
+    rather batching light packages in the same area. This could be solved with
+    a clustering approach and then queue the packages ordered by weight.
     """
 
     def __init__(self, deliveries, weights):
         super(Scheduler3, self).__init__('Scheduler3')
         self.__weights = weights
-        self.__drones_queue, self.__cyclists_queue = self.__create_queues(
+        self.__drones_queue, self.__cyclists_queue = self._create_queues(
             deliveries, weights)
         self.__balance_queues()
         self.__cyclists_queue = self.__sort_by_angle(self.__cyclists_queue)
-
-    @staticmethod
-    # TODO: move this to the super-class
-    def __create_queues(deliveries, weights):
-        """
-        Creates two queues of packages, one for the drones and other for the
-        cyclists.
-        """
-        drones_queue = deque()
-        cyclists_queue = deque()
-        for delivery in deliveries:
-            for product in delivery.packages:
-                package = (delivery.destination, product)
-                if weights[product] <= 5:
-                    drones_queue.append(package)
-                else:
-                    cyclists_queue.append(package)
-        return drones_queue, cyclists_queue
 
     def __balance_queues(self):
         """
@@ -63,7 +51,7 @@ class Scheduler3(Scheduler):
         Sorts all the packages by the angle between the X axis and their
         position vector.
         """
-        sorted_list = sorted(packages, key = lambda p: atan(p[0][1] / p[0][0]))
+        sorted_list = sorted(packages, key = lambda p: atan2(p[0][1], p[0][0]))
         return deque(sorted_list)
 
     def get_route_for_drone(self):
@@ -110,7 +98,6 @@ class Scheduler3(Scheduler):
             kms = Scheduler3.__calculate_route_distance(route)
             if kms < min_kms:
                 min_kms, best_route = kms, route
-        print('BEST ROUTE: {}'.format(best_route))
         return deque(route)
 
     @staticmethod
