@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+
+
+import argparse
+from random import choice, randint, uniform
+
+
+def parse_args():
+    """
+    Parses arguments given by the user in the command line.
+    """
+    parser = argparse.ArgumentParser(
+        description='Helper script to generate random deliveries files.')
+    parser.add_argument('number', type=int, help='number of deliveries')
+    parser.add_argument('max', type=int, help='-max <= x, y <= max')
+    return parser.parse_args()
+
+
+def generate_deliveries(number, max_):
+    """
+    """
+    lines = []
+    product_count = 0
+    for _ in range(number):
+        line_tokens = []
+        n_packages = choice((1, 2, 3, 4))
+        line_tokens.append(str(n_packages))
+        for count in range(n_packages):
+            product = 'product{}'.format(product_count)
+            line_tokens.append(product)
+            product_count += 1
+        line_tokens.append(str(randint(-max_, max_)))
+        line_tokens.append(str(randint(-max_, max_)))
+        lines.append(' '.join(line_tokens))
+    return lines, product_count
+
+
+def generate_weights(n_products):
+    """
+    """
+    lines = []
+    for i in range(n_products):
+        line_tokens = []
+        line_tokens.append('product{}'.format(i))
+        # 1/3 of chances that a product can be delivered by a drone.
+        if choice((0, 1, 2)) == 0:
+            weight = round(uniform(0, 5), 2)
+        else:
+            weight = round(uniform(5, 50), 2)
+        line_tokens.append(str(weight))
+        lines.append(' '.join(line_tokens))
+    return lines
+
+
+def main():
+    args = parse_args()
+    deliveries_lines, product_count = generate_deliveries(
+        args.number, args.max)
+    weights_lines = generate_weights(product_count)
+    with open('deliveries.txt', 'w') as file_:
+        file_.write(str(len(deliveries_lines)))
+        file_.write('\n')
+        file_.write('\n'.join(deliveries_lines))
+        file_.write('\n')
+        file_.write(str(product_count))
+        file_.write('\n')
+        file_.write('\n'.join(weights_lines))
+        file_.write('\n')
+
+
+if __name__ == '__main__':
+    main()

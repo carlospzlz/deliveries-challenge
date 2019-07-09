@@ -15,9 +15,8 @@ def parse_args():
     """
     Parses arguments given by the user in the command line.
     """
-    description = (
-        'Runs a simulation for the deliveries challenge.')
-    parser = argparse.ArgumentParser(description=description)
+    parser = argparse.ArgumentParser(
+        description= 'Runs a simulation for the deliveries challenge.')
     parser.add_argument(
         'drones', type=int, help='Number of drones')
     parser.add_argument(
