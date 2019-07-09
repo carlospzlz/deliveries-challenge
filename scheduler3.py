@@ -25,7 +25,6 @@ class Scheduler3(Scheduler):
         self.__weights = weights
         self.__drones_queue, self.__cyclists_queue = self._create_queues(
             deliveries, weights)
-        self.__balance_queues()
         self.__cyclists_queue = self.__sort_by_angle(self.__cyclists_queue)
 
     def __balance_queues(self):
