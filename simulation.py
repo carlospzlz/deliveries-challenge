@@ -203,7 +203,7 @@ class Simulation(object):
             if self.__vehicle_is_at_depot(drone):
                 route = self.__scheduler.get_route_for_drone()
                 if route:
-                    print('Drone {} got route: {}'.format(id_, route))
+                    #print('Drone {} got route: {}'.format(id_, route))
                     self.__routes[id_] = route
                     destination, _ = route[0]
                     drone['destination'] = destination
@@ -236,7 +236,7 @@ class Simulation(object):
             if self.__vehicle_is_at_depot(cyclist):
                 route = self.__scheduler.get_route_for_cyclist()
                 if route:
-                    print('Cyclist {} got route: {}'.format(id_, route))
+                    #print('Cyclist {} got route: {}'.format(id_, route))
                     self.__routes[id_] = route
                     destination, _ = route[0]
                     cyclist['destination'] = destination
@@ -299,8 +299,8 @@ class Simulation(object):
         The vehicle with the id `id_` has delivered the given packages to the
         given destination.
         """
-        print('{} {} delivered to {} packages: {}'.format(
-            type_.capitalize(), id_, destination, packages))
+        #print('{} {} delivered to {} packages: {}'.format(
+        #    type_.capitalize(), id_, destination, packages))
         self.__delivered[destination].update(packages)
         if self.__delivered[destination] == self.__deliveries[destination]:
             self.__deliveries_scatter[destination].set_facecolor(
