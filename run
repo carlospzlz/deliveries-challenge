@@ -87,7 +87,7 @@ def assert_all_packages_have_weight(deliveries, weights):
         for product in delivery.packages:
             if product not in weights:
                 msg = 'ERROR: All products must have a weight: {}'
-                print(msg.format(package))
+                print(msg.format(product))
                 sys.exit(1)
 
 
