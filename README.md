@@ -93,3 +93,4 @@ And then you could simulate that:
 ```
 ./run 4 4 schedule3 < deliveries.txt
 ```
+![](captures/example_simulation.gif)
