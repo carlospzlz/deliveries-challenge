@@ -268,9 +268,9 @@ class TestScheduler3(TestCase):
         weights = {'product0': 7, 'product1': 7, 'product2': 7}
         scheduler = Scheduler3(deliveries, weights)
         expected = deque((
-            ((1, 0), ('product0', )),
-            ((1, 0), ('product1', )),
-            ((0, 1), ('product2', )),
+            ((2, 1), ('product2', )),
+            ((2, 3), ('product0', )),
+            ((1, 1), ('product1', )),
         ))
         result = scheduler.get_route_for_cyclist()
         print(result)

@@ -2,7 +2,7 @@
 """
 
 from collections import deque
-from itertools import combinations
+from itertools import permutations
 from math import atan2, pi, sqrt
 from sys import maxsize
 
@@ -79,9 +79,9 @@ class Scheduler3(Scheduler):
                 route_stops.append(route_stop)
                 self.__cyclists_queue.popleft()
             else:
-                if not route_stops:
-                    return None
-                return self.__create_best_route(route_stops)
+                if route_stops:
+                    return self.__create_best_route(route_stops)
+                return None
         # After all elements in the queue have been consumed we may have a
         # valid route.
         if route_stops:
@@ -93,13 +93,13 @@ class Scheduler3(Scheduler):
         """
         TPS
         """
-        routes = combinations(route_stops, len(route_stops))
+        routes = permutations(route_stops, len(route_stops))
         min_kms, best_route = maxsize, None
         for route in routes:
             kms = Scheduler3.__calculate_route_distance(route)
             if kms < min_kms:
                 min_kms, best_route = kms, route
-        return deque(route)
+        return deque(best_route)
 
     @staticmethod
     def __calculate_route_distance(route):
