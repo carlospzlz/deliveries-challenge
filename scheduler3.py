@@ -79,6 +79,8 @@ class Scheduler3(Scheduler):
                 route_stops.append(route_stop)
                 self.__cyclists_queue.popleft()
             else:
+                if not route_stops:
+                    return None
                 return self.__create_best_route(route_stops)
         # After all elements in the queue have been consumed we may have a
         # valid route.
