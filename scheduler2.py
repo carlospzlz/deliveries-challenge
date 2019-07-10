@@ -30,7 +30,7 @@ class Scheduler2(Scheduler):
 
     def get_route_for_drone(self):
         """
-        Returns the a route for the next package in the drones queue.
+        Returns a route for the next package in the drones queue.
         """
         if self.__drones_queue:
             destination, product = self.__drones_queue.popleft()
@@ -54,7 +54,9 @@ class Scheduler2(Scheduler):
                 route.append(route_stop)
                 self.__cyclists_queue.popleft()
             else:
-                return route
+                if route:
+                    return route
+                return None
         # After all elements in the queue have been consumed we may have a
         # valid route.
         if route:

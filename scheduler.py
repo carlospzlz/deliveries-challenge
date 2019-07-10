@@ -1,5 +1,5 @@
 """
-This module contains interface that schedulers should implement.
+This module contains the interface that schedulers should implement.
 """
 
 from abc import ABC, abstractmethod

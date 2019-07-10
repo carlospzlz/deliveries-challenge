@@ -16,7 +16,7 @@ class Scheduler1(Scheduler):
     This scheduler presents the following problems:
     - The next delivery could be given to a cyclist, even if it was more
     efficient that a drone did it.
-    - Cyclists do single deliveries even if the have capacity to batch some of
+    - Cyclists do single deliveries even if they have capacity to batch some of
     them.
     """
 

@@ -1,5 +1,5 @@
 """
-This modules contains unit-tests for the Scheduler3
+This modules contains unit-tests for the Scheduler3.
 """
 
 from collections import deque
@@ -21,7 +21,7 @@ class TestScheduler3(TestCase):
         deliveries = (
             Delivery(('product0', ), (4, 2)),
         )
-        weights = {'product0' : 2}
+        weights = {'product0': 2}
         scheduler = Scheduler3(deliveries, weights)
         expected = deque((
             ((4, 2), ('product0', )),
@@ -64,7 +64,7 @@ class TestScheduler3(TestCase):
         deliveries = (
             Delivery(('product0', 'product1', 'product2'), (4, 2)),
         )
-        weights = {'product0': 6, 'product1':10, 'product2':5}
+        weights = {'product0': 6, 'product1': 10, 'product2': 5}
         scheduler = Scheduler3(deliveries, weights)
         expected = deque((
             ((4, 2), ('product2', )),
@@ -162,14 +162,14 @@ class TestScheduler3(TestCase):
         result = scheduler.get_route_for_cyclist()
         self.assertEqual(result, expected)
 
-    def test_get_route_for_cyclist_from_delivery_batch_several(self):
+    def test_get_route_for_cyclist_several_packages_from_delivery_batch(self):
         """
         Several packages from a delivery can be given to a cyclist.
         """
         deliveries = (
             Delivery(('product0', 'product1', 'product2'), (4, 2)),
         )
-        weights = {'product0': 6, 'product1':10, 'product2': 5}
+        weights = {'product0': 6, 'product1': 10, 'product2': 5}
         scheduler = Scheduler3(deliveries, weights)
         expected = deque((
             ((4, 2), ('product0', )),
@@ -228,7 +228,6 @@ class TestScheduler3(TestCase):
         result = scheduler.get_route_for_cyclist()
         self.assertEqual(result, expected)
 
-
     def test_get_route_for_cyclist_batch_packages_up_to_fifty_kg(self):
         """
         Cyclists can batch packages up to 50 kg.
@@ -273,9 +272,4 @@ class TestScheduler3(TestCase):
             ((1, 1), ('product1', )),
         ))
         result = scheduler.get_route_for_cyclist()
-        print(result)
         self.assertEqual(result, expected)
-
-    # packages of different deliveries can given to the same cyclist
-
-    # the best route is given to cyclist
