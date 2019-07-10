@@ -22,6 +22,7 @@ def parse_args():
 
 def generate_deliveries(number, max_):
     """
+    Generates the file lines for the deliveries with random deliveries.
     """
     lines = []
     product_count = 0
@@ -41,6 +42,7 @@ def generate_deliveries(number, max_):
 
 def generate_weights(n_products):
     """
+    Generates the file lines for the weights with random weights.
     """
     lines = []
     for i in range(n_products):
